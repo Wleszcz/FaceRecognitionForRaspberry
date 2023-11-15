@@ -1,16 +1,17 @@
 from guizero import App, Picture, PushButton
 import cv2
-from PIL import Image
+from PIL import Image, ImageDraw
 import io
+
 
 class ASWApp:
     app: App
     button: PushButton
-    loaded_image = None
+    loaded_image: Image = None
 
-    def button_click(self):
+    def getfile(self):
         path = self.app.select_file()
-        self.loaded_image = cv2.imread(path)
+        self.loaded_image = Image.open(path)
 
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
@@ -19,7 +20,7 @@ class ASWApp:
         self.init_gui()
 
     def init_gui(self):
-        self.button = PushButton(self.app, self.app.select_file, text="Load Image")
+        self.button = PushButton(self.app, command=self.getfile, text="Load Image")
         self.picture = Picture(self.app, image=None)
 
     def find_faces(self, frame):
@@ -34,18 +35,24 @@ class ASWApp:
             return
 
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        faces = self.find_faces(frame)
-
-        for x, y, w, h in faces:
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
-            if self.loaded_image:
-                # cv2.image(frame, self.loaded_image, (x, y), (x + w, y + h))
-                cv2.imshow(frame, self.loaded_image)
 
         img = Image.fromarray(frame)
+        img = self.draw_faces(img, self.find_faces(frame))
+
         img = img.resize((640, 480))
         self.picture.image = img
 
     def run(self):
         self.app.repeat(70, self.update_gui)
         self.app.display()
+
+    def draw_faces(self, img, faces):
+        for x, y, w, h in faces:
+            if self.loaded_image:
+                copy = self.loaded_image.copy()
+                copy = copy.resize((w, h))
+                img.paste(copy, (x, y), copy)
+
+            img1 = ImageDraw.Draw(img)
+            img1.rectangle(((x, y), (x + w, y + h)), outline="red")
+        return img
