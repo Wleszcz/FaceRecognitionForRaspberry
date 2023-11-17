@@ -1,4 +1,4 @@
-from guizero import App, Picture, PushButton
+from guizero import App, Picture, PushButton, Text
 import cv2
 from PIL import Image, ImageDraw
 import io
@@ -7,6 +7,7 @@ import io
 class ASWApp:
     app: App
     button: PushButton
+    count: Text
     loaded_image: Image = None
 
     def getfile(self):
@@ -21,6 +22,7 @@ class ASWApp:
 
     def init_gui(self):
         self.button = PushButton(self.app, command=self.getfile, text="Load Image")
+        self.count = Text(self.app, text="Shalom", size=20)
         self.picture = Picture(self.app, image=None)
 
     def find_faces(self, frame):
@@ -47,6 +49,7 @@ class ASWApp:
         self.app.display()
 
     def draw_faces(self, img, faces):
+        self.count.value = "Faces detected: " + str(len(faces))
         for x, y, w, h in faces:
             if self.loaded_image:
                 copy = self.loaded_image.copy()
