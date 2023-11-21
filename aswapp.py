@@ -12,10 +12,11 @@ class ASWApp:
 
     def getfile(self):
         path = self.app.select_file()
-        self.loaded_image = Image.open(path)
+        if path:
+            self.loaded_image = Image.open(path)
 
     def __init__(self):
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
         self.app = App("OpenCV and guizero Example")
         self.facecascade = cv2.CascadeClassifier("assets/haarcascade_frontalface_default.xml")
         self.init_gui()
@@ -45,7 +46,7 @@ class ASWApp:
         self.picture.image = img
 
     def run(self):
-        self.app.repeat(70, self.update_gui)
+        self.app.repeat(100, self.update_gui)
         self.app.display()
 
     def draw_faces(self, img, faces):
