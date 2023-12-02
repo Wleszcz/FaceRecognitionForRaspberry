@@ -6,6 +6,7 @@ from pyzbar.pyzbar import decode
 alpha = 1.3  # Contrast control (1.0-3.0)
 beta = 0  # Brightness control (0-100)
 
+# python3 -m pip install pyzbar
 
 class ASWApp:
     app: App
